@@ -1,5 +1,5 @@
 import * as React from "react"
-import { EditorContent, EditorContext, useEditor } from "@tiptap/react"
+import { EditorContent, EditorContext, useEditor, useEditorState } from "@tiptap/react"
 
 // --- Tiptap Core Extensions ---
 import { StarterKit } from "@tiptap/starter-kit"
@@ -38,6 +38,7 @@ import { ImageUploadButton } from "@/components/tiptap-ui/image-upload-button"
 import { ListDropdownMenu } from "@/components/tiptap-ui/list-dropdown-menu"
 import { BlockquoteButton } from "@/components/tiptap-ui/blockquote-button"
 import { CodeBlockButton } from "@/components/tiptap-ui/code-block-button"
+import { CharacterCount } from '@tiptap/extensions'
 import {
   ColorHighlightPopover,
   ColorHighlightPopoverContent,
@@ -96,12 +97,12 @@ const MainToolbarContent = ({
 
       <ToolbarGroup>
         <HeadingDropdownMenu levels={[1, 2, 3, 4]} portal={isMobile} />
-        <ListDropdownMenu
+        {/* <ListDropdownMenu
           types={["bulletList", "orderedList", "taskList"]}
           portal={isMobile}
-        />
-        <BlockquoteButton />
-        <CodeBlockButton />
+        /> */}
+        {/* <BlockquoteButton /> */}
+        {/* <CodeBlockButton /> */}
       </ToolbarGroup>
 
       <ToolbarSeparator />
@@ -110,22 +111,22 @@ const MainToolbarContent = ({
         <MarkButton type="bold" />
         <MarkButton type="italic" />
         <MarkButton type="strike" />
-        <MarkButton type="code" />
+        {/* <MarkButton type="code" /> */}
         <MarkButton type="underline" />
         {!isMobile ? (
           <ColorHighlightPopover />
         ) : (
           <ColorHighlightPopoverButton onClick={onHighlighterClick} />
         )}
-        {!isMobile ? <LinkPopover /> : <LinkButton onClick={onLinkClick} />}
+        {/* {!isMobile ? <LinkPopover /> : <LinkButton onClick={onLinkClick} />} */}
       </ToolbarGroup>
 
       <ToolbarSeparator />
 
-      <ToolbarGroup>
+      {/* <ToolbarGroup>
         <MarkButton type="superscript" />
         <MarkButton type="subscript" />
-      </ToolbarGroup>
+      </ToolbarGroup> */}
 
       <ToolbarSeparator />
 
@@ -138,9 +139,9 @@ const MainToolbarContent = ({
 
       <ToolbarSeparator />
 
-      <ToolbarGroup>
+      {/* <ToolbarGroup>
         <ImageUploadButton text="Add" />
-      </ToolbarGroup>
+      </ToolbarGroup> */}
 
       <Spacer />
 
@@ -220,6 +221,9 @@ export function SimpleEditor() {
       Superscript,
       Subscript,
       Selection,
+      CharacterCount.configure({
+        wordCounter: (text) => text.split(/\s+/).filter((word) => word !== '').length,
+      }),
       ImageUploadNode.configure({
         accept: "image/*",
         maxSize: MAX_FILE_SIZE,
@@ -278,6 +282,8 @@ export function SimpleEditor() {
           role="presentation"
           className="simple-editor-content"
         />
+        {editor?.storage.characterCount.words()} words
+      <Button onClick={() => console.log('button clicked')}>Save</Button>
       </EditorContext.Provider>
     </div>
   )
