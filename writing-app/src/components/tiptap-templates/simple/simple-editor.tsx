@@ -342,6 +342,16 @@ export function SimpleEditor() {
           }
         }
       }}>Restore</Button>
+      
+      <Button onClick={async () => {
+        try {
+          const response = await fetch('http://localhost:8000/')
+          const data = await response.json()
+          console.log('FastAPI response:', data)
+        } catch (error) {
+          console.error('Error calling FastAPI:', error)
+        }
+      }}>Test FastAPI</Button>
       </div>
       </EditorContext.Provider>
     </div>
