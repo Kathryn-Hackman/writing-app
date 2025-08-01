@@ -63,6 +63,7 @@ import { useIsMobile } from "@/hooks/use-mobile"
 import { useWindowSize } from "@/hooks/use-window-size"
 import { useCursorVisibility } from "@/hooks/use-cursor-visibility"
 import { useScrolling } from "@/hooks/use-scrolling"
+import { useThrottledCallback } from "@/hooks/use-throttled-callback"
 
 // --- Components ---
 import { ThemeToggle } from "@/components/tiptap-templates/simple/theme-toggle"
@@ -74,6 +75,40 @@ import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils"
 import "@/components/tiptap-templates/simple/simple-editor.scss"
 
 import content from "@/components/tiptap-templates/simple/data/content.json"
+
+// Custom hook for optimized word counting
+const useWordCount = (editor: any) => {
+  const [wordCount, setWordCount] = React.useState(0)
+
+  const updateWordCount = React.useCallback(() => {
+    if (editor?.storage?.characterCount) {
+      const count = editor.storage.characterCount.words()
+      setWordCount(count)
+    }
+  }, [editor])
+
+  const throttledUpdateWordCount = useThrottledCallback(updateWordCount, 100)
+
+  React.useEffect(() => {
+    if (!editor) return
+
+    // Initial count
+    updateWordCount()
+
+    // Listen to editor updates
+    const onUpdate = () => {
+      throttledUpdateWordCount()
+    }
+
+    editor.on('update', onUpdate)
+
+    return () => {
+      editor.off('update', onUpdate)
+    }
+  }, [editor, throttledUpdateWordCount])
+
+  return wordCount
+}
 
 const MainToolbarContent = ({
   onHighlighterClick,
@@ -240,6 +275,7 @@ export function SimpleEditor() {
     editor,
     overlayHeight: toolbarRef.current?.getBoundingClientRect().height ?? 0,
   })
+  const wordCount = useWordCount(editor)
 
   React.useEffect(() => {
     if (!isMobile && mobileView !== "main") {
@@ -282,7 +318,8 @@ export function SimpleEditor() {
           role="presentation"
           className="simple-editor-content"
         />
-        {editor?.storage.characterCount.words()} words
+        {wordCount} words
+        <div>
       <Button onClick={() => {
         if (editor) {
           const content = editor.getJSON()
@@ -305,6 +342,7 @@ export function SimpleEditor() {
           }
         }
       }}>Restore</Button>
+      </div>
       </EditorContext.Provider>
     </div>
   )
