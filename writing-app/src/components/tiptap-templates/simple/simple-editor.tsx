@@ -283,7 +283,28 @@ export function SimpleEditor() {
           className="simple-editor-content"
         />
         {editor?.storage.characterCount.words()} words
-      <Button onClick={() => console.log('button clicked')}>Save</Button>
+      <Button onClick={() => {
+        if (editor) {
+          const content = editor.getJSON()
+          console.log('Editor content:', JSON.stringify(content, null, 2))
+          
+          // Example: Store the content (you could save this to localStorage, API, etc.)
+          localStorage.setItem('editorContent', JSON.stringify(content))
+        }
+      }}>Save</Button>
+      
+      <Button onClick={() => {
+        if (editor) {
+          const savedContent = localStorage.getItem('editorContent')
+          if (savedContent) {
+            const content = JSON.parse(savedContent)
+            editor.commands.setContent(content)
+            console.log('Content restored from JSON')
+          } else {
+            console.log('No saved content found')
+          }
+        }
+      }}>Restore</Button>
       </EditorContext.Provider>
     </div>
   )
