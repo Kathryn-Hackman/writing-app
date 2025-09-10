@@ -1,10 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from sqlmodel import Field, SQLModel
 
 
-class Item(BaseModel):
-    name: str
+class SampleEntry(SQLModel, table=True):
+    id: int
+    content: str
 
 
 app = FastAPI()
@@ -27,6 +28,7 @@ async def root():
     return {"message": "Hello World"}
 
 
-@app.post("/items/")
-async def create_item(item: Item):
-    return item
+@app.post("/entries/")
+async def create_item(entry: SampleEntry):
+
+    return entry
