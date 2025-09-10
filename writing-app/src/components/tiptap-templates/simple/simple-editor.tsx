@@ -4,10 +4,8 @@ import { EditorContent, EditorContext, useEditor, useEditorState } from "@tiptap
 // --- Tiptap Core Extensions ---
 import { StarterKit } from "@tiptap/starter-kit"
 import { Image } from "@tiptap/extension-image"
-import { TaskItem, TaskList } from "@tiptap/extension-list"
 import { TextAlign } from "@tiptap/extension-text-align"
 import { Typography } from "@tiptap/extension-typography"
-import { Highlight } from "@tiptap/extension-highlight"
 import { Subscript } from "@tiptap/extension-subscript"
 import { Superscript } from "@tiptap/extension-superscript"
 import { Selection } from "@tiptap/extensions"
@@ -22,33 +20,16 @@ import {
 } from "@/components/tiptap-ui-primitive/toolbar"
 
 // --- Tiptap Node ---
-import { ImageUploadNode } from "@/components/tiptap-node/image-upload-node/image-upload-node-extension"
 import { HorizontalRule } from "@/components/tiptap-node/horizontal-rule-node/horizontal-rule-node-extension"
 import "@/components/tiptap-node/blockquote-node/blockquote-node.scss"
 import "@/components/tiptap-node/code-block-node/code-block-node.scss"
 import "@/components/tiptap-node/horizontal-rule-node/horizontal-rule-node.scss"
 import "@/components/tiptap-node/list-node/list-node.scss"
 import "@/components/tiptap-node/image-node/image-node.scss"
-import "@/components/tiptap-node/heading-node/heading-node.scss"
 import "@/components/tiptap-node/paragraph-node/paragraph-node.scss"
 
 // --- Tiptap UI ---
-import { HeadingDropdownMenu } from "@/components/tiptap-ui/heading-dropdown-menu"
-import { ImageUploadButton } from "@/components/tiptap-ui/image-upload-button"
-import { ListDropdownMenu } from "@/components/tiptap-ui/list-dropdown-menu"
-import { BlockquoteButton } from "@/components/tiptap-ui/blockquote-button"
-import { CodeBlockButton } from "@/components/tiptap-ui/code-block-button"
 import { CharacterCount } from '@tiptap/extensions'
-import {
-  ColorHighlightPopover,
-  ColorHighlightPopoverContent,
-  ColorHighlightPopoverButton,
-} from "@/components/tiptap-ui/color-highlight-popover"
-import {
-  LinkPopover,
-  LinkContent,
-  LinkButton,
-} from "@/components/tiptap-ui/link-popover"
 import { MarkButton } from "@/components/tiptap-ui/mark-button"
 import { TextAlignButton } from "@/components/tiptap-ui/text-align-button"
 import { UndoRedoButton } from "@/components/tiptap-ui/undo-redo-button"
@@ -63,21 +44,51 @@ import { useIsMobile } from "@/hooks/use-mobile"
 import { useWindowSize } from "@/hooks/use-window-size"
 import { useCursorVisibility } from "@/hooks/use-cursor-visibility"
 import { useScrolling } from "@/hooks/use-scrolling"
+import { useThrottledCallback } from "@/hooks/use-throttled-callback"
 
 // --- Components ---
 import { ThemeToggle } from "@/components/tiptap-templates/simple/theme-toggle"
-
-// --- Lib ---
-import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils"
 
 // --- Styles ---
 import "@/components/tiptap-templates/simple/simple-editor.scss"
 
 import content from "@/components/tiptap-templates/simple/data/content.json"
 
+// Custom hook for optimized word counting
+const useWordCount = (editor: any) => {
+  const [wordCount, setWordCount] = React.useState(0)
+
+  const updateWordCount = React.useCallback(() => {
+    if (editor?.storage?.characterCount) {
+      const count = editor.storage.characterCount.words()
+      setWordCount(count)
+    }
+  }, [editor])
+
+  const throttledUpdateWordCount = useThrottledCallback(updateWordCount, 100)
+
+  React.useEffect(() => {
+    if (!editor) return
+
+    // Initial count
+    updateWordCount()
+
+    // Listen to editor updates
+    const onUpdate = () => {
+      throttledUpdateWordCount()
+    }
+
+    editor.on('update', onUpdate)
+
+    return () => {
+      editor.off('update', onUpdate)
+    }
+  }, [editor, throttledUpdateWordCount])
+
+  return wordCount
+}
+
 const MainToolbarContent = ({
-  onHighlighterClick,
-  onLinkClick,
   isMobile,
 }: {
   onHighlighterClick: () => void
@@ -96,38 +107,13 @@ const MainToolbarContent = ({
       <ToolbarSeparator />
 
       <ToolbarGroup>
-        <HeadingDropdownMenu levels={[1, 2, 3, 4]} portal={isMobile} />
-        {/* <ListDropdownMenu
-          types={["bulletList", "orderedList", "taskList"]}
-          portal={isMobile}
-        /> */}
-        {/* <BlockquoteButton /> */}
-        {/* <CodeBlockButton /> */}
-      </ToolbarGroup>
-
-      <ToolbarSeparator />
-
-      <ToolbarGroup>
         <MarkButton type="bold" />
         <MarkButton type="italic" />
         <MarkButton type="strike" />
-        {/* <MarkButton type="code" /> */}
         <MarkButton type="underline" />
-        {!isMobile ? (
-          <ColorHighlightPopover />
-        ) : (
-          <ColorHighlightPopoverButton onClick={onHighlighterClick} />
-        )}
-        {/* {!isMobile ? <LinkPopover /> : <LinkButton onClick={onLinkClick} />} */}
       </ToolbarGroup>
 
       <ToolbarSeparator />
-
-      {/* <ToolbarGroup>
-        <MarkButton type="superscript" />
-        <MarkButton type="subscript" />
-      </ToolbarGroup> */}
-
       <ToolbarSeparator />
 
       <ToolbarGroup>
@@ -138,10 +124,6 @@ const MainToolbarContent = ({
       </ToolbarGroup>
 
       <ToolbarSeparator />
-
-      {/* <ToolbarGroup>
-        <ImageUploadButton text="Add" />
-      </ToolbarGroup> */}
 
       <Spacer />
 
@@ -174,12 +156,7 @@ const MobileToolbarContent = ({
     </ToolbarGroup>
 
     <ToolbarSeparator />
-
-    {type === "highlighter" ? (
-      <ColorHighlightPopoverContent />
-    ) : (
-      <LinkContent />
-    )}
+    
   </>
 )
 
@@ -212,10 +189,7 @@ export function SimpleEditor() {
         },
       }),
       HorizontalRule,
-      TextAlign.configure({ types: ["heading", "paragraph"] }),
-      TaskList,
-      TaskItem.configure({ nested: true }),
-      Highlight.configure({ multicolor: true }),
+      TextAlign.configure({ types: [ "paragraph"] }),
       Image,
       Typography,
       Superscript,
@@ -223,13 +197,6 @@ export function SimpleEditor() {
       Selection,
       CharacterCount.configure({
         wordCounter: (text) => text.split(/\s+/).filter((word) => word !== '').length,
-      }),
-      ImageUploadNode.configure({
-        accept: "image/*",
-        maxSize: MAX_FILE_SIZE,
-        limit: 3,
-        upload: handleImageUpload,
-        onError: (error) => console.error("Upload failed:", error),
       }),
     ],
     content,
@@ -240,6 +207,7 @@ export function SimpleEditor() {
     editor,
     overlayHeight: toolbarRef.current?.getBoundingClientRect().height ?? 0,
   })
+  const wordCount = useWordCount(editor)
 
   React.useEffect(() => {
     if (!isMobile && mobileView !== "main") {
@@ -282,7 +250,9 @@ export function SimpleEditor() {
           role="presentation"
           className="simple-editor-content"
         />
-        {editor?.storage.characterCount.words()} words
+        {wordCount} / 100 words
+        <div>
+      <div className="button-bar">
       <Button onClick={() => {
         if (editor) {
           const content = editor.getJSON()
@@ -315,6 +285,11 @@ export function SimpleEditor() {
           console.error('Error calling FastAPI:', error)
         }
       }}>Test FastAPI</Button>
+      <Button disabled={wordCount < 100} onClick={() => {
+        alert('Saved to database!')
+      }}>Share</Button>
+      </div>
+      </div>
       </EditorContext.Provider>
     </div>
   )
