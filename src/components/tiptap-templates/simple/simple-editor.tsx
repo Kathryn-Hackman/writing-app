@@ -11,48 +11,41 @@ import { Superscript } from "@tiptap/extension-superscript"
 import { Selection } from "@tiptap/extensions"
 
 // --- UI Primitives ---
-import { Button } from "@/components/tiptap-ui-primitive/button"
-import { Spacer } from "@/components/tiptap-ui-primitive/spacer"
+import { Button } from "../../tiptap-ui-primitive/button"
+import { Spacer } from "../../tiptap-ui-primitive/spacer"
 import {
   Toolbar,
   ToolbarGroup,
   ToolbarSeparator,
-} from "@/components/tiptap-ui-primitive/toolbar"
+} from "../../tiptap-ui-primitive/toolbar"
 
 // --- Tiptap Node ---
-import { HorizontalRule } from "@/components/tiptap-node/horizontal-rule-node/horizontal-rule-node-extension"
-import "@/components/tiptap-node/blockquote-node/blockquote-node.scss"
-import "@/components/tiptap-node/code-block-node/code-block-node.scss"
 import "@/components/tiptap-node/horizontal-rule-node/horizontal-rule-node.scss"
 import "@/components/tiptap-node/list-node/list-node.scss"
-import "@/components/tiptap-node/image-node/image-node.scss"
 import "@/components/tiptap-node/paragraph-node/paragraph-node.scss"
 
 // --- Tiptap UI ---
 import { CharacterCount } from '@tiptap/extensions'
-import { MarkButton } from "@/components/tiptap-ui/mark-button"
-import { TextAlignButton } from "@/components/tiptap-ui/text-align-button"
-import { UndoRedoButton } from "@/components/tiptap-ui/undo-redo-button"
+import { MarkButton } from "../../tiptap-ui/mark-button"
+import { TextAlignButton } from "../../tiptap-ui/text-align-button"
+import { UndoRedoButton } from "../../tiptap-ui/undo-redo-button"
 
 // --- Icons ---
-import { ArrowLeftIcon } from "@/components/tiptap-icons/arrow-left-icon"
-import { HighlighterIcon } from "@/components/tiptap-icons/highlighter-icon"
-import { LinkIcon } from "@/components/tiptap-icons/link-icon"
+import { ArrowLeftIcon } from "../../tiptap-icons/arrow-left-icon"
 
 // --- Hooks ---
-import { useIsMobile } from "@/hooks/use-mobile"
-import { useWindowSize } from "@/hooks/use-window-size"
-import { useCursorVisibility } from "@/hooks/use-cursor-visibility"
-import { useScrolling } from "@/hooks/use-scrolling"
-import { useThrottledCallback } from "@/hooks/use-throttled-callback"
+import { useIsMobile } from "../../../hooks/use-mobile"
+import { useWindowSize } from "../../../hooks/use-window-size"
+import { useCursorVisibility } from "../../../hooks/use-cursor-visibility"
+import { useScrolling } from "../../../hooks/use-scrolling"
+import { useThrottledCallback } from "../../../hooks/use-throttled-callback"
 
 // --- Components ---
-import { ThemeToggle } from "@/components/tiptap-templates/simple/theme-toggle"
+import { ThemeToggle } from "./theme-toggle"
 
 // --- Styles ---
 import "@/components/tiptap-templates/simple/simple-editor.scss"
-
-import content from "@/components/tiptap-templates/simple/data/content.json"
+import content from "./data/content.json"
 
 // Custom hook for optimized word counting
 const useWordCount = (editor: any) => {
@@ -147,11 +140,6 @@ const MobileToolbarContent = ({
     <ToolbarGroup>
       <Button data-style="ghost" onClick={onBack}>
         <ArrowLeftIcon className="tiptap-button-icon" />
-        {type === "highlighter" ? (
-          <HighlighterIcon className="tiptap-button-icon" />
-        ) : (
-          <LinkIcon className="tiptap-button-icon" />
-        )}
       </Button>
     </ToolbarGroup>
 
@@ -188,7 +176,6 @@ export function SimpleEditor() {
           enableClickSelection: true,
         },
       }),
-      HorizontalRule,
       TextAlign.configure({ types: [ "paragraph"] }),
       Image,
       Typography,
