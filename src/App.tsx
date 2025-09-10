@@ -2,11 +2,13 @@ import './App.css'
 import { SimpleEditor } from './components/tiptap-templates/simple/simple-editor'
 
 function App() {
-  const dateOptions = { weekday: "long"} as const;
-  const currentDate = new Date().toLocaleDateString('en-us', dateOptions);
+  const weekday = new Date().toLocaleDateString('default', { weekday: "long" });
+  const month = new Date().toLocaleDateString('default', { month: "long" });
+  const day = new Date().toLocaleDateString('default', { day: "numeric" });
+
   return (
     <>
-      <h4>{currentDate}</h4>
+      <h4>{weekday + ', ' + month + ' ' + day}</h4>
       <h2>Hello, I'm the prompt</h2>
       <SimpleEditor></SimpleEditor>
     </>
