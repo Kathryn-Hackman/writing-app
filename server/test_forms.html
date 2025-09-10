@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>API Testing Forms</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      .container {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+      h1 {
+        color: #333;
+        text-align: center;
+        margin-bottom: 30px;
+      }
+      h2 {
+        color: #555;
+        border-bottom: 2px solid #007bff;
+        padding-bottom: 10px;
+      }
+      form {
+        margin-bottom: 20px;
+      }
+      .form-group {
+        margin-bottom: 15px;
+      }
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #333;
+      }
+      input,
+      textarea,
+      select {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+        box-sizing: border-box;
+      }
+      textarea {
+        height: 80px;
+        resize: vertical;
+      }
+      button {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        margin-right: 10px;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      .result {
+        margin-top: 15px;
+        padding: 10px;
+        border-radius: 4px;
+        white-space: pre-wrap;
+        font-family: monospace;
+        font-size: 12px;
+      }
+      .success {
+        background-color: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+      }
+      .error {
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+      @media (max-width: 768px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .data-section {
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 15px;
+        background-color: #f8f9fa;
+      }
+
+      .data-section h3 {
+        margin-top: 0;
+        color: #495057;
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 8px;
+      }
+
+      .data-content {
+        max-height: 300px;
+        overflow-y: auto;
+        background-color: white;
+        border: 1px solid #e9ecef;
+        border-radius: 4px;
+        padding: 10px;
+        font-family: monospace;
+        font-size: 12px;
+        white-space: pre-wrap;
+      }
+
+      .data-item {
+        margin-bottom: 10px;
+        padding: 8px;
+        background-color: #f1f3f4;
+        border-radius: 3px;
+        border-left: 3px solid #007bff;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>API Testing Forms</h1>
+
+    <div class="grid">
+      <!-- Create Author Form -->
+      <div class="container">
+        <h2>Create Author</h2>
+        <form id="createAuthorForm">
+          <div class="form-group">
+            <label for="authorEmail">Email:</label>
+            <input type="email" id="authorEmail" name="email" required />
+          </div>
+          <div class="form-group">
+            <label for="authorPassword">Password:</label>
+            <input
+              type="password"
+              id="authorPassword"
+              name="password"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="authorName">Name:</label>
+            <input type="text" id="authorName" name="name" required />
+          </div>
+          <button type="submit">Create Author</button>
+        </form>
+        <div id="authorResult" class="result" style="display: none"></div>
+      </div>
+
+      <!-- Create Group Form -->
+      <div class="container">
+        <h2>Create Group</h2>
+        <form id="createGroupForm">
+          <div class="form-group">
+            <label for="groupName">Group Name:</label>
+            <input type="text" id="groupName" name="name" required />
+          </div>
+          <div class="form-group">
+            <label for="groupAdminId">Admin ID (optional):</label>
+            <input type="number" id="groupAdminId" name="admin_id" />
+          </div>
+          <button type="submit">Create Group</button>
+        </form>
+        <div id="groupResult" class="result" style="display: none"></div>
+      </div>
+
+      <!-- Create Story Form -->
+      <div class="container">
+        <h2>Create Story</h2>
+        <form id="createStoryForm">
+          <div class="form-group">
+            <label for="storyTitle">Title:</label>
+            <input type="text" id="storyTitle" name="title" required />
+          </div>
+          <div class="form-group">
+            <label for="storyIsDone">Is Done:</label>
+            <select id="storyIsDone" name="isDone">
+              <option value="false">False</option>
+              <option value="true">True</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="storyGroupId">Group ID (optional):</label>
+            <input type="number" id="storyGroupId" name="group_id" />
+          </div>
+          <button type="submit">Create Story</button>
+        </form>
+        <div id="storyResult" class="result" style="display: none"></div>
+      </div>
+
+      <!-- Create Post Form -->
+      <div class="container">
+        <h2>Create Post</h2>
+        <form id="createPostForm">
+          <div class="form-group">
+            <label for="postText">Text:</label>
+            <textarea id="postText" name="text" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="postDateUnix">Date (Unix Timestamp):</label>
+            <input
+              type="number"
+              id="postDateUnix"
+              name="date_unixtime"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="postStoryId">Story ID (optional):</label>
+            <input type="number" id="postStoryId" name="story_id" />
+          </div>
+          <div class="form-group">
+            <label for="postAuthorId">Author ID (optional):</label>
+            <input type="number" id="postAuthorId" name="author_id" />
+          </div>
+          <button type="submit">Create Post</button>
+        </form>
+        <div id="postResult" class="result" style="display: none"></div>
+      </div>
+    </div>
+
+    <!-- Get Story Form -->
+    <div class="container">
+      <h2>Get Story by ID</h2>
+      <form id="getStoryForm">
+        <div class="form-group">
+          <label for="getStoryId">Story ID:</label>
+          <input type="number" id="getStoryId" name="story_id" required />
+        </div>
+        <button type="submit">Get Story</button>
+      </form>
+      <div id="getStoryResult" class="result" style="display: none"></div>
+    </div>
+
+    <!-- Data Viewer -->
+    <div class="container">
+      <h2>Database Data Viewer</h2>
+      <div style="margin-bottom: 20px">
+        <button
+          onclick="loadAllData()"
+          style="background-color: #28a745; margin-right: 10px"
+        >
+          Load All Data
+        </button>
+        <button onclick="clearDataViewer()" style="background-color: #dc3545">
+          Clear
+        </button>
+      </div>
+
+      <div id="dataViewer">
+        <div id="authorsData" class="data-section" style="display: none">
+          <h3>Authors ({{count}})</h3>
+          <div class="data-content"></div>
+        </div>
+
+        <div id="groupsData" class="data-section" style="display: none">
+          <h3>Groups ({{count}})</h3>
+          <div class="data-content"></div>
+        </div>
+
+        <div id="storiesData" class="data-section" style="display: none">
+          <h3>Stories ({{count}})</h3>
+          <div class="data-content"></div>
+        </div>
+
+        <div id="postsData" class="data-section" style="display: none">
+          <h3>Posts ({{count}})</h3>
+          <div class="data-content"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const API_BASE = "";
+
+      // Helper function to show results
+      function showResult(elementId, data, isError = false) {
+        const resultDiv = document.getElementById(elementId);
+        resultDiv.style.display = "block";
+        resultDiv.className = `result ${isError ? "error" : "success"}`;
+        resultDiv.textContent = JSON.stringify(data, null, 2);
+      }
+
+      // Helper function to make API calls
+      async function makeApiCall(endpoint, data) {
+        try {
+          const response = await fetch(`${API_BASE}${endpoint}`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          });
+
+          const result = await response.json();
+
+          if (!response.ok) {
+            throw new Error(
+              `HTTP ${response.status}: ${result.detail || "Unknown error"}`
+            );
+          }
+
+          return result;
+        } catch (error) {
+          throw error;
+        }
+      }
+
+      // Helper function for GET requests
+      async function makeGetCall(endpoint) {
+        try {
+          const response = await fetch(`${API_BASE}${endpoint}`);
+          const result = await response.json();
+
+          if (!response.ok) {
+            throw new Error(
+              `HTTP ${response.status}: ${result.detail || "Unknown error"}`
+            );
+          }
+
+          return result;
+        } catch (error) {
+          throw error;
+        }
+      }
+
+      // Create Author Form
+      document
+        .getElementById("createAuthorForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const formData = new FormData(e.target);
+          const data = {
+            email: formData.get("email"),
+            password: formData.get("password"),
+            name: formData.get("name"),
+          };
+
+          try {
+            const result = await makeApiCall("/create_author/", data);
+            showResult("authorResult", result);
+          } catch (error) {
+            showResult("authorResult", { error: error.message }, true);
+          }
+        });
+
+      // Create Group Form
+      document
+        .getElementById("createGroupForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const formData = new FormData(e.target);
+          const data = {
+            name: formData.get("name"),
+          };
+
+          const adminId = formData.get("admin_id");
+          if (adminId) {
+            data.admin_id = parseInt(adminId);
+          }
+
+          try {
+            const result = await makeApiCall("/create_group/", data);
+            showResult("groupResult", result);
+          } catch (error) {
+            showResult("groupResult", { error: error.message }, true);
+          }
+        });
+
+      // Create Story Form
+      document
+        .getElementById("createStoryForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const formData = new FormData(e.target);
+          const data = {
+            title: formData.get("title"),
+            isDone: formData.get("isDone") === "true",
+          };
+
+          const groupId = formData.get("group_id");
+          if (groupId) {
+            data.group_id = parseInt(groupId);
+          }
+
+          try {
+            const result = await makeApiCall("/create_story/", data);
+            showResult("storyResult", result);
+          } catch (error) {
+            showResult("storyResult", { error: error.message }, true);
+          }
+        });
+
+      // Create Post Form
+      document
+        .getElementById("createPostForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const formData = new FormData(e.target);
+          const data = {
+            text: formData.get("text"),
+            date_unixtime: parseInt(formData.get("date_unixtime")),
+          };
+
+          const storyId = formData.get("story_id");
+          if (storyId) {
+            data.story_id = parseInt(storyId);
+          }
+
+          const authorId = formData.get("author_id");
+          if (authorId) {
+            data.author_id = parseInt(authorId);
+          }
+
+          try {
+            const result = await makeApiCall("/create_post/", data);
+            showResult("postResult", result);
+          } catch (error) {
+            showResult("postResult", { error: error.message }, true);
+          }
+        });
+
+      // Get Story Form
+      document
+        .getElementById("getStoryForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const formData = new FormData(e.target);
+          const storyId = formData.get("story_id");
+
+          try {
+            const result = await makeGetCall(`/get_story/${storyId}`);
+            showResult("getStoryResult", result);
+          } catch (error) {
+            showResult("getStoryResult", { error: error.message }, true);
+          }
+        });
+
+      // Set current timestamp for post form
+      document.getElementById("postDateUnix").value = Math.floor(
+        Date.now() / 1000
+      );
+
+      // Data viewer functions
+      async function loadAllData() {
+        try {
+          // Load all data in parallel
+          const [authors, groups, stories, posts] = await Promise.all([
+            makeGetCall("/authors/"),
+            makeGetCall("/groups/"),
+            makeGetCall("/stories/"),
+            makeGetCall("/posts/"),
+          ]);
+
+          // Display each dataset
+          displayData("authorsData", "Authors", authors);
+          displayData("groupsData", "Groups", groups);
+          displayData("storiesData", "Stories", stories);
+          displayData("postsData", "Posts", posts);
+        } catch (error) {
+          console.error("Error loading data:", error);
+          alert("Error loading data: " + error.message);
+        }
+      }
+
+      function displayData(sectionId, title, data) {
+        const section = document.getElementById(sectionId);
+        const content = section.querySelector(".data-content");
+        const header = section.querySelector("h3");
+
+        if (data && data.length > 0) {
+          header.textContent = `${title} (${data.length})`;
+          content.innerHTML = data
+            .map(
+              (item) =>
+                `<div class="data-item">${JSON.stringify(item, null, 2)}</div>`
+            )
+            .join("");
+          section.style.display = "block";
+        } else {
+          header.textContent = `${title} (0)`;
+          content.innerHTML = "No data found";
+          section.style.display = "block";
+        }
+      }
+
+      function clearDataViewer() {
+        const sections = [
+          "authorsData",
+          "groupsData",
+          "storiesData",
+          "postsData",
+        ];
+        sections.forEach((sectionId) => {
+          const section = document.getElementById(sectionId);
+          section.style.display = "none";
+          section.querySelector(".data-content").innerHTML = "";
+        });
+      }
+    </script>
+  </body>
+</html>
