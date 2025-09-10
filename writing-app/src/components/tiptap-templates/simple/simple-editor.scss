@@ -52,7 +52,12 @@ body,
   display: flex;
   flex-direction: column;
 }
-
+.button-bar {
+  padding-top: 10rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
 .simple-editor-content {
   max-width: 648px;
   width: 100%;
