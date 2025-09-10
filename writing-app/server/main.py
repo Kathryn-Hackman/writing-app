@@ -3,11 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import Field, SQLModel
 
 
-class SampleEntry(SQLModel, table=True):
-    id: int
-    content: str
-
-
 app = FastAPI()
 
 # Add CORS middleware
@@ -29,6 +24,6 @@ async def root():
 
 
 @app.post("/entries/")
-async def create_item(entry: SampleEntry):
+async def create_item():
 
-    return entry
+    return "hi!"
