@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Simple API Test</title>
+  </head>
+  <body>
+    <h1>Simple API Test</h1>
+    <button onclick="testAPI()">Test API</button>
+    <div id="result"></div>
+
+    <script>
+      async function testAPI() {
+        const resultDiv = document.getElementById("result");
+
+        try {
+          console.log("Making request to API...");
+
+          const response = await fetch("/", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+
+          console.log("Response received:", response);
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+
+          const data = await response.json();
+          console.log("Data received:", data);
+
+          resultDiv.innerHTML = `<pre>Success: ${JSON.stringify(
+            data,
+            null,
+            2
+          )}</pre>`;
+          resultDiv.style.color = "green";
+        } catch (error) {
+          console.error("Error:", error);
+          resultDiv.innerHTML = `<pre>Error: ${error.message}</pre>`;
+          resultDiv.style.color = "red";
+        }
+      }
+    </script>
+  </body>
+</html>
