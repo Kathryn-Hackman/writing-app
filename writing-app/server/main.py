@@ -4,6 +4,7 @@ from sqlmodel import Field, SQLModel, create_engine, Session, Relationship
 from typing import Annotated, Union, List, Optional
 import random
 
+
 class Author(SQLModel, table=True):
     id: Union[int, None] = Field(default=None, primary_key=True)
     email: str
@@ -95,8 +96,3 @@ async def create_story(story: Story, session: SessionDep):
 async def create_story(story_id: int, session: SessionDep):
     story = session.get(Story, story_id)
     return story
-=======
-@app.post("/entries/")
-async def create_item():
-
-    return "hi!"
